@@ -1,0 +1,57 @@
+{
+  "schema_version": 1,
+  "app": {
+    "timezone": "Asia/Jerusalem",
+    "date_format": "DD/MM/YY",
+    "rtl": true,
+    "theme": "dark"
+  },
+  "ui_state": {
+    "project_order": [
+      "proj_2"
+    ],
+    "locked_projects_session": {},
+    "undo": {
+      "stack": [],
+      "redo_stack": []
+    }
+  },
+  "projects": {
+    "proj_2": {
+      "id": "proj_2",
+      "title": "Second Project",
+      "short_description": "Another project",
+      "detailed_description": "",
+      "notebook": "",
+      "tags": [],
+      "color": "auto",
+      "time_range": {
+        "start_iso": "2025-03-01T00:00:00",
+        "end_iso": "2025-04-01T00:00:00",
+        "is_user_defined": true
+      },
+      "milestone_ids": []
+    }
+  },
+  "tasks": {},
+  "backups": [
+    {
+      "id": "bkp_20251227_213413_252",
+      "created_at_iso": "2025-12-27T21:34:13.252503",
+      "reason": "manual_save",
+      "file_path": "data\\backups\\state_20251227_213413_252.json"
+    },
+    {
+      "id": "bkp_20251227_213414_582",
+      "created_at_iso": "2025-12-27T21:34:14.582904",
+      "reason": "manual_save",
+      "file_path": "data\\backups\\state_20251227_213414_582.json"
+    },
+    {
+      "id": "bkp_20251227_213429_058",
+      "created_at_iso": "2025-12-27T21:34:29.058752",
+      "reason": "manual_save",
+      "file_path": "data\\backups\\state_20251227_213429_058.json"
+    }
+  ]
+}

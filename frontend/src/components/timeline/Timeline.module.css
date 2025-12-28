@@ -1,0 +1,522 @@
+/* Timeline container */
+.timelineContainer {
+  position: relative;
+  width: 100%;
+  margin-top: var(--spacing-md);
+  user-select: none;
+}
+
+.timeline {
+  position: relative;
+  width: 100%;
+  min-height: 120px;
+  background-color: var(--color-bg-tertiary);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.timeline.zoomActive {
+  border-color: var(--color-accent-primary);
+  box-shadow: var(--shadow-glow);
+}
+
+/* Axis area - top section with date labels */
+.axisArea {
+  position: relative;
+  height: 32px;
+  background: linear-gradient(
+    to bottom,
+    var(--color-bg-secondary) 0%,
+    var(--color-bg-tertiary) 100%
+  );
+  border-bottom: 1px solid var(--color-border);
+  overflow: hidden;
+}
+
+.axisContent {
+  position: relative;
+  height: 100%;
+}
+
+/* Timeline arrow line */
+.axisLine {
+  position: absolute;
+  bottom: 8px;
+  left: 16px;
+  right: 16px;
+  height: 2px;
+  background-color: var(--color-text-tertiary);
+}
+
+/* Arrow pointing left (future direction in RTL) */
+.axisArrow {
+  position: absolute;
+  bottom: 4px;
+  left: 8px;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 8px solid var(--color-text-tertiary);
+}
+
+/* Tick marks */
+.tick {
+  position: absolute;
+  bottom: 6px;
+  width: 1px;
+  background-color: var(--color-text-tertiary);
+  transform: translateX(50%);
+}
+
+.tick.minor {
+  height: 6px;
+  opacity: 0.5;
+}
+
+.tick.major {
+  height: 10px;
+}
+
+/* Tick labels */
+.tickLabel {
+  position: absolute;
+  top: 4px;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  transform: translateX(50%);
+}
+
+/* Milestones area */
+.milestonesArea {
+  position: relative;
+  min-height: 80px;
+  padding: var(--spacing-sm) var(--spacing-md);
+}
+
+.milestonesContent {
+  position: relative;
+  min-height: 60px;
+}
+
+/* Milestone row */
+.milestoneRow {
+  position: relative;
+  height: 28px;
+  margin-bottom: var(--spacing-xs);
+}
+
+/* Milestone bar (range type) */
+.milestoneBar {
+  position: absolute;
+  height: 20px;
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.milestoneBar:hover {
+  box-shadow: var(--shadow-md);
+  transform: translateY(-1px);
+}
+
+.milestoneBar.dragging {
+  cursor: grabbing;
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+  opacity: 0.9;
+}
+
+/* Resize handles */
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+  background: transparent;
+  z-index: 1;
+}
+
+.resizeHandle:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.resizeHandle.start {
+  right: 0; /* RTL: start handle on right side */
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.resizeHandle.end {
+  left: 0; /* RTL: end handle on left side */
+  border-radius: var(--radius-sm) 0 0 var(--radius-sm);
+}
+
+/* Milestone point (point type) */
+.milestonePoint {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  border-radius: var(--radius-full);
+  cursor: grab;
+  transform: translate(50%, 0);
+  transition: box-shadow var(--transition-fast), transform var(--transition-fast);
+  border: 2px solid var(--color-bg-primary);
+}
+
+.milestonePoint:hover {
+  box-shadow: var(--shadow-md);
+  transform: translate(50%, -2px) scale(1.1);
+}
+
+.milestonePoint.dragging {
+  cursor: grabbing;
+  box-shadow: var(--shadow-lg);
+  z-index: 10;
+}
+
+/* Milestone label */
+.milestoneLabel {
+  position: absolute;
+  font-size: var(--font-size-xs);
+  color: var(--color-text-primary);
+  white-space: nowrap;
+  max-width: 120px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  padding: 2px 4px;
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-secondary);
+  pointer-events: none;
+}
+
+/* Connecting line from label to bar */
+.connectorLine {
+  position: absolute;
+  width: 1px;
+  background-color: var(--color-text-tertiary);
+  pointer-events: none;
+}
+
+/* Today marker */
+.todayMarker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background-color: var(--color-error);
+  z-index: 5;
+  transform: translateX(50%);
+}
+
+.todayMarker::before {
+  content: "היום";
+  position: absolute;
+  top: -20px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  white-space: nowrap;
+}
+
+/* Empty state */
+.emptyState {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 60px;
+  color: var(--color-text-tertiary);
+  font-size: var(--font-size-sm);
+}
+
+.emptyStateIcon {
+  margin-bottom: var(--spacing-xs);
+  opacity: 0.5;
+}
+
+/* Add milestone button */
+.addButton {
+  position: absolute;
+  bottom: var(--spacing-sm);
+  left: var(--spacing-sm);
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: var(--radius-full);
+  background-color: var(--color-accent-primary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+  z-index: 10;
+}
+
+.addButton:hover {
+  background-color: var(--color-accent-primary-hover);
+  transform: scale(1.1);
+}
+
+.addButton:focus-visible {
+  outline: 2px solid var(--color-accent-primary);
+  outline-offset: 2px;
+}
+
+/* Zoom controls */
+.zoomControls {
+  position: absolute;
+  top: var(--spacing-sm);
+  left: var(--spacing-sm);
+  display: flex;
+  gap: var(--spacing-xs);
+  z-index: 10;
+}
+
+.zoomButton {
+  width: 24px;
+  height: 24px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg-secondary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-fast);
+}
+
+.zoomButton:hover {
+  background-color: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.zoomButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.zoomLevel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  padding: 0 var(--spacing-xs);
+  display: flex;
+  align-items: center;
+}
+
+/* Milestone label with expand button */
+.milestoneLabel {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+}
+
+.milestoneLabel.expanded {
+  background: var(--color-accent-primary);
+  color: white;
+  border-color: var(--color-accent-primary) !important;
+}
+
+.milestoneLabelText {
+  max-width: 100px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.expandButton {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 2px 4px;
+  border: none;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 255, 255, 0.2);
+  color: inherit;
+  font-size: var(--font-size-xs);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.expandButton:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.subtaskCount {
+  font-size: 10px;
+  font-weight: var(--font-weight-medium);
+}
+
+/* Subtask section */
+.subtaskSection {
+  margin-top: var(--spacing-md);
+  padding: var(--spacing-sm);
+  background: var(--color-bg-tertiary);
+  border-radius: var(--radius-md);
+}
+
+.subtaskList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+}
+
+.subtaskItem {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  padding: var(--spacing-sm) var(--spacing-md);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background: var(--color-bg-secondary);
+  color: var(--color-text-primary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+  min-width: 120px;
+}
+
+.subtaskItem:hover {
+  background: var(--color-bg-hover);
+  border-color: var(--color-accent-primary);
+}
+
+.subtaskItem.selected {
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: white;
+}
+
+.subtaskItem.dimmed {
+  opacity: 0.5;
+  pointer-events: auto;
+}
+
+.subtaskTitle {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  margin-bottom: var(--spacing-xs);
+}
+
+.subtaskStatus {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+}
+
+.subtaskItem.selected .subtaskStatus {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Mobile adjustments */
+@media (max-width: 768px) {
+  .timeline {
+    min-height: 100px;
+  }
+
+  .axisArea {
+    height: 28px;
+  }
+
+  .tickLabel {
+    font-size: 10px;
+  }
+
+  .milestoneBar {
+    height: 24px;
+  }
+
+  .milestonePoint {
+    width: 20px;
+    height: 20px;
+  }
+
+  /* Larger touch targets for resize handles on mobile */
+  .resizeHandle {
+    width: 16px;
+  }
+
+  .milestoneLabelText {
+    max-width: 60px;
+  }
+
+  .addButton {
+    width: 36px;
+    height: 36px;
+  }
+
+  .zoomButton {
+    width: 32px;
+    height: 32px;
+  }
+
+  .subtaskItem {
+    min-width: 100px;
+    padding: var(--spacing-sm);
+  }
+}
+
+/* Touch feedback for coarse pointers (touch devices) */
+@media (pointer: coarse) {
+  .milestoneBar {
+    touch-action: none;
+  }
+
+  .milestoneBar:active {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .milestonePoint {
+    touch-action: none;
+  }
+
+  .milestonePoint:active {
+    transform: translate(50%, -4px) scale(1.2);
+    box-shadow: var(--shadow-lg);
+  }
+
+  .resizeHandle {
+    width: 20px;
+  }
+
+  .addButton {
+    width: 44px;
+    height: 44px;
+  }
+
+  .addButton:active {
+    transform: scale(0.9);
+  }
+
+  .zoomButton {
+    width: 40px;
+    height: 40px;
+  }
+
+  .zoomButton:active {
+    transform: scale(0.9);
+    background: var(--color-accent-primary);
+    color: white;
+  }
+
+  .subtaskItem {
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  .subtaskItem:active {
+    transform: scale(0.98);
+  }
+
+  .expandButton {
+    padding: var(--spacing-xs) var(--spacing-sm);
+    min-height: 32px;
+  }
+}

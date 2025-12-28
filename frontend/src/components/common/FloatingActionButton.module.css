@@ -1,0 +1,69 @@
+.fab {
+  position: fixed;
+  bottom: var(--spacing-xl);
+  left: var(--spacing-xl);
+  z-index: var(--z-fab);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: var(--fab-size);
+  height: var(--fab-size);
+  padding: 0;
+  border: none;
+  border-radius: var(--radius-full);
+
+  background-color: var(--color-accent-primary);
+  color: white;
+
+  cursor: pointer;
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-fast);
+}
+
+.fab:hover:not(:disabled) {
+  background-color: var(--color-accent-primary-hover);
+  transform: scale(1.05);
+  box-shadow: var(--shadow-xl), var(--shadow-glow);
+}
+
+.fab:active:not(:disabled) {
+  background-color: var(--color-accent-primary-active);
+  transform: scale(0.98);
+}
+
+.fab:focus-visible {
+  outline: 2px solid var(--color-text-primary);
+  outline-offset: 4px;
+}
+
+.fab:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  box-shadow: var(--shadow-sm);
+}
+
+/* Animation on mount */
+.fab {
+  animation: fabEnter var(--transition-normal) ease-out;
+}
+
+@keyframes fabEnter {
+  from {
+    opacity: 0;
+    transform: scale(0.5) translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+/* Mobile positioning */
+@media (max-width: 640px) {
+  .fab {
+    bottom: var(--spacing-lg);
+    left: var(--spacing-lg);
+  }
+}

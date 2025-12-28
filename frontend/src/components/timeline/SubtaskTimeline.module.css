@@ -1,0 +1,268 @@
+/* Subtask Timeline - Mini timeline for drill-down */
+
+.container {
+  margin-top: var(--spacing-md);
+  background: var(--color-bg-secondary);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: var(--spacing-sm) var(--spacing-md);
+  background: var(--color-bg-tertiary);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.title {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--color-text-primary);
+}
+
+.closeButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: none;
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.closeButton:hover {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.timeline {
+  position: relative;
+  padding: var(--spacing-md);
+  min-height: 100px;
+}
+
+/* Zoom controls */
+.zoomControls {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-sm);
+}
+
+.zoomButton {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 22px;
+  height: 22px;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background: var(--color-bg-primary);
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.zoomButton:hover:not(:disabled) {
+  background: var(--color-bg-hover);
+  color: var(--color-text-primary);
+}
+
+.zoomButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.zoomLevel {
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  min-width: 50px;
+  text-align: center;
+}
+
+/* Axis */
+.axis {
+  position: relative;
+  height: 24px;
+  margin-bottom: var(--spacing-sm);
+}
+
+.axisLine {
+  position: absolute;
+  right: 0;
+  left: 10px;
+  top: 50%;
+  height: 2px;
+  background: var(--color-border);
+  transform: translateY(-50%);
+}
+
+.axisArrow {
+  position: absolute;
+  left: 0;
+  top: 50%;
+  width: 0;
+  height: 0;
+  border-top: 5px solid transparent;
+  border-bottom: 5px solid transparent;
+  border-right: 8px solid var(--color-border);
+  transform: translateY(-50%);
+}
+
+.tick {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  background: var(--color-border);
+  transform: translateX(-50%) translateY(-50%);
+}
+
+.tick.major {
+  height: 12px;
+}
+
+.tick.minor {
+  height: 6px;
+}
+
+.tickLabel {
+  position: absolute;
+  top: -4px;
+  transform: translateX(-50%) translateY(-100%);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-tertiary);
+  white-space: nowrap;
+}
+
+/* Bar area */
+.barArea {
+  position: relative;
+  height: 50px;
+  margin-bottom: var(--spacing-sm);
+}
+
+/* Today marker */
+.todayMarker {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--color-error);
+  transform: translateX(-50%);
+  opacity: 0.7;
+}
+
+.todayMarker::before {
+  content: "היום";
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-xs);
+  color: var(--color-error);
+  white-space: nowrap;
+}
+
+/* Subtask bar */
+.subtaskBar {
+  position: absolute;
+  top: 4px;
+  height: 20px;
+  background: var(--color-accent-primary);
+  border-radius: var(--radius-sm);
+  cursor: grab;
+  transition: transform var(--transition-fast);
+}
+
+.subtaskBar:hover {
+  transform: scaleY(1.1);
+}
+
+.subtaskBar.dragging {
+  cursor: grabbing;
+  opacity: 0.8;
+}
+
+/* Resize handles */
+.resizeHandle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 8px;
+  cursor: ew-resize;
+}
+
+.resizeHandle.start {
+  right: 0;
+}
+
+.resizeHandle.end {
+  left: 0;
+}
+
+/* Subtask point */
+.subtaskPoint {
+  position: absolute;
+  top: 4px;
+  width: 16px;
+  height: 16px;
+  background: var(--color-accent-primary);
+  border-radius: var(--radius-full);
+  transform: translateX(-50%);
+  cursor: grab;
+  transition: transform var(--transition-fast);
+}
+
+.subtaskPoint:hover {
+  transform: translateX(-50%) scale(1.2);
+}
+
+.subtaskPoint.dragging {
+  cursor: grabbing;
+  opacity: 0.8;
+}
+
+/* Subtask label */
+.subtaskLabel {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: var(--font-size-xs);
+  color: var(--color-text-secondary);
+  white-space: nowrap;
+  background: var(--color-bg-secondary);
+  padding: 0 var(--spacing-xs);
+  border-radius: var(--radius-sm);
+}
+
+/* Add button */
+.addButton {
+  position: absolute;
+  top: var(--spacing-sm);
+  left: var(--spacing-sm);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-full);
+  background: transparent;
+  color: var(--color-text-tertiary);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.addButton:hover {
+  background: var(--color-accent-primary);
+  border-color: var(--color-accent-primary);
+  color: white;
+}

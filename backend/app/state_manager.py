@@ -61,6 +61,9 @@ class StateManager:
         saved_at_iso = now.isoformat()
         backup_id = None
 
+        existing_state = self.load_state()
+        state.backups = existing_state.backups.copy()
+
         if create_backup:
             backup_id = self._create_backup(state, now)
 
@@ -82,8 +85,9 @@ class StateManager:
         Returns:
             The backup ID
         """
-        backup_id = f"bkp_{timestamp.strftime('%Y%m%d_%H%M%S')}"
-        backup_filename = f"state_{timestamp.strftime('%Y%m%d_%H%M%S')}.json"
+        ms = timestamp.strftime('%f')[:3]
+        backup_id = f"bkp_{timestamp.strftime('%Y%m%d_%H%M%S')}_{ms}"
+        backup_filename = f"state_{timestamp.strftime('%Y%m%d_%H%M%S')}_{ms}.json"
         backup_path = self.backups_dir / backup_filename
 
         state_dict = state.model_dump(mode="json")

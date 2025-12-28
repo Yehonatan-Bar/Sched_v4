@@ -1,140 +1,103 @@
-import { useEffect, useState } from "react";
-import { api } from "./api/client";
-import type { AppState, BackupInfo } from "./types/schema";
-import { createDefaultState } from "./types/schema";
-import "./App.css";
+import { useEffect, lazy, Suspense } from "react";
+import { Routes, Route, useNavigate } from "react-router-dom";
+import { ThemeProvider, AppProvider, useApp } from "./contexts";
+import { AppLayout, ProjectList, FloatingActionButton, PlusIcon, LoaderIcon } from "./components";
+import "./index.css";
 
-function App() {
-  const [state, setState] = useState<AppState | null>(null);
-  const [backups, setBackups] = useState<BackupInfo[]>([]);
-  const [status, setStatus] = useState<string>("טוען...");
-  const [error, setError] = useState<string | null>(null);
+// Lazy load the ProjectPage for code splitting
+const ProjectPage = lazy(() =>
+  import("./components/project/ProjectPage").then((module) => ({
+    default: module.ProjectPage,
+  }))
+);
 
-  useEffect(() => {
-    loadData();
-  }, []);
+function DashboardContent() {
+  const { createProject } = useApp();
+  const navigate = useNavigate();
 
-  async function loadData() {
-    try {
-      const health = await api.health();
-      setStatus(`שרת פעיל: ${health.message}`);
-
-      const appState = await api.getState();
-      setState(appState);
-
-      const backupList = await api.getBackups();
-      setBackups(backupList.backups);
-
-      setError(null);
-    } catch (e) {
-      setError(`שגיאה בטעינה: ${e instanceof Error ? e.message : "Unknown error"}`);
-      setStatus("לא מחובר לשרת");
-    }
+  function handleCreateProject() {
+    createProject();
   }
 
-  async function handleSave() {
-    if (!state) return;
-    try {
-      const response = await api.saveState(state);
-      setStatus(`נשמר בהצלחה: ${response.saved_at_iso}`);
-      await loadData();
-    } catch (e) {
-      setError(`שגיאה בשמירה: ${e instanceof Error ? e.message : "Unknown error"}`);
-    }
-  }
-
-  async function handleCreateDefaultState() {
-    const newState = createDefaultState();
-    setState(newState);
-    setStatus("נוצר state ברירת מחדל (לא נשמר)");
-  }
-
-  async function handleRestore(backupId: string) {
-    try {
-      const response = await api.restoreBackup(backupId);
-      setStatus(`שוחזר בהצלחה: ${response.restored_at_iso}`);
-      await loadData();
-    } catch (e) {
-      setError(`שגיאה בשחזור: ${e instanceof Error ? e.message : "Unknown error"}`);
-    }
+  function handleNavigateToProject(projectId: string) {
+    navigate(`/project/${projectId}`);
   }
 
   return (
-    <div dir="rtl" style={{ fontFamily: "Arial, sans-serif", padding: "20px" }}>
-      <h1>מערכת ניהול פרויקטים - שלב 1</h1>
+    <>
+      <ProjectList onNavigateToProject={handleNavigateToProject} />
+      <FloatingActionButton
+        onClick={handleCreateProject}
+        ariaLabel="צור פרויקט חדש"
+        title="צור פרויקט חדש"
+      >
+        <PlusIcon size={28} />
+      </FloatingActionButton>
+    </>
+  );
+}
 
-      <div style={{ marginBottom: "20px", padding: "10px", background: "#f0f0f0", borderRadius: "8px" }}>
-        <strong>סטטוס: </strong>{status}
-        {error && <div style={{ color: "red", marginTop: "10px" }}>{error}</div>}
-      </div>
+function AppContent() {
+  const { undo, redo, canUndo, canRedo } = useApp();
 
-      <div style={{ display: "flex", gap: "10px", marginBottom: "20px" }}>
-        <button onClick={loadData}>רענן נתונים</button>
-        <button onClick={handleCreateDefaultState}>צור state חדש</button>
-        <button onClick={handleSave} disabled={!state}>שמור</button>
-      </div>
+  // Keyboard shortcuts for Undo/Redo
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Check if Ctrl (or Cmd on Mac) is pressed
+      const isCtrl = e.ctrlKey || e.metaKey;
 
-      <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "20px" }}>
-        <div>
-          <h2>State נוכחי</h2>
-          <pre style={{
-            background: "#1e1e1e",
-            color: "#d4d4d4",
-            padding: "15px",
-            borderRadius: "8px",
-            overflow: "auto",
-            maxHeight: "400px",
-            fontSize: "12px",
-            direction: "ltr",
-            textAlign: "left",
-          }}>
-            {state ? JSON.stringify(state, null, 2) : "אין נתונים"}
-          </pre>
-        </div>
+      if (isCtrl && e.key === "z") {
+        if (e.shiftKey) {
+          // Ctrl+Shift+Z = Redo
+          e.preventDefault();
+          if (canRedo) {
+            redo();
+          }
+        } else {
+          // Ctrl+Z = Undo
+          e.preventDefault();
+          if (canUndo) {
+            undo();
+          }
+        }
+      } else if (isCtrl && e.key === "y") {
+        // Ctrl+Y = Redo (alternative)
+        e.preventDefault();
+        if (canRedo) {
+          redo();
+        }
+      }
+    };
 
-        <div>
-          <h2>גיבויים ({backups.length})</h2>
-          {backups.length === 0 ? (
-            <p>אין גיבויים</p>
-          ) : (
-            <ul style={{ listStyle: "none", padding: 0 }}>
-              {backups.map((backup) => (
-                <li
-                  key={backup.id}
-                  style={{
-                    padding: "10px",
-                    marginBottom: "10px",
-                    background: "#f5f5f5",
-                    borderRadius: "8px",
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <div>
-                    <strong>{backup.id}</strong>
-                    <br />
-                    <small>{backup.created_at_iso}</small>
-                  </div>
-                  <button onClick={() => handleRestore(backup.id)}>שחזר</button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
-      </div>
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [undo, redo, canUndo, canRedo]);
 
-      <div style={{ marginTop: "30px", padding: "20px", background: "#e8f5e9", borderRadius: "8px" }}>
-        <h3>שלב 1 - בדיקות בסיס</h3>
-        <ul>
-          <li>✅ GET /api/health - בדיקת זמינות</li>
-          <li>✅ GET /api/state - קבלת state מלא</li>
-          <li>✅ PUT /api/state - שמירה + יצירת גיבוי</li>
-          <li>✅ GET /api/state/backups - רשימת גיבויים</li>
-          <li>✅ POST /api/state/backups/{"{id}"}/restore - שחזור מגיבוי</li>
-        </ul>
-      </div>
-    </div>
+  return (
+    <AppLayout>
+      <Suspense
+        fallback={
+          <div style={{ display: "flex", justifyContent: "center", alignItems: "center", minHeight: "200px" }}>
+            <LoaderIcon size={32} />
+          </div>
+        }
+      >
+        <Routes>
+          <Route path="/" element={<DashboardContent />} />
+          <Route path="/project/:projectId" element={<ProjectPage />} />
+        </Routes>
+      </Suspense>
+    </AppLayout>
+  );
+}
+
+function App() {
+  return (
+    <ThemeProvider>
+      <AppProvider>
+        <AppContent />
+      </AppProvider>
+    </ThemeProvider>
   );
 }
 
